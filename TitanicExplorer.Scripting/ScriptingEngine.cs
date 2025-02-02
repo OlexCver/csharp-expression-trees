@@ -12,11 +12,29 @@
 
         public static Expression IsPrime(ParameterExpression value)
         {
-            var label = Expression.Label();
+            var itHandleFunc =
+        """
+                    
+            if (number <= 1) return false;
+            if (number == 2) return true;
+            if (number % 2 == 0) return false;
+            var boundary = (int)Math.Floor(Math.Sqrt(number));
+            for (int i = 3; i <= boundary; i += 2) 
+            {
+              if (number % i == 0)
+              {
+                 return false;
+              }
+            }
+
+            return true;
+    
+        """;
+            var label = Expression.Label(); // This is the label to break the loop
 
             var result = Expression.Parameter(typeof(bool), "result");
 
-            var returnLabel = Expression.Label(typeof(bool));
+            var returnLabel = Expression.Label(typeof(bool));  // This is the label to return the result
 
             var valueLessThanEqualToOne = Expression.LessThanOrEqual(value, Expression.Constant(1));
             var valueEqualTwo = Expression.Equal(value, Expression.Constant(2));
@@ -33,7 +51,7 @@
 
             var i = Expression.Variable(typeof(int), "i");
 
-            Expression modBlock = Expression.IfThen(
+            Expression modBlock = Expression.IfThen( // This is the block that checks if the number is divisible by i inside Loop
                 Expression.Equal(Expression.Modulo(value, i), Expression.Constant(0)),
                 Expression.Return(returnLabel, Expression.Constant(false))
             );
@@ -57,7 +75,7 @@
 
                     Expression.Assign(i, Expression.Constant(3)),
                     Expression.Assign(boundary, evalFunction),
-                    Expression.Loop(
+                    Expression.Loop( // This is the loop that checks if the number is prime
                         Expression.IfThenElse
                         (
                             Expression.LessThanOrEqual(i, boundary),
