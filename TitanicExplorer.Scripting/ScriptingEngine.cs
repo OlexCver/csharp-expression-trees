@@ -31,24 +31,16 @@
     
         """;
             var label = Expression.Label(); // This is the label to break the loop
-
             var result = Expression.Parameter(typeof(bool), "result");
-
             var returnLabel = Expression.Label(typeof(bool));  // This is the label to return the result
-
-            var valueLessThanEqualToOne = Expression.LessThanOrEqual(value, Expression.Constant(1));
-            var valueEqualTwo = Expression.Equal(value, Expression.Constant(2));
-            var valueModTwoZero = Expression.Equal(Expression.Modulo(value, Expression.Constant(2)), Expression.Constant(0));
 
             var sqRt = typeof(Math).GetMethod("Sqrt");
             var floor = typeof(Math).GetMethod("Floor", new Type[] { typeof(double) });
 
             var valueSqRt = Expression.Call(null, sqRt, Expression.Convert(value, typeof(double)));
-
             var evalFunction = Expression.Convert(Expression.Call(null, floor, valueSqRt), typeof(int));
 
             var boundary = Expression.Variable(typeof(int), "boundary");
-
             var i = Expression.Variable(typeof(int), "i");
 
             Expression modBlock = Expression.IfThen( // This is the block that checks if the number is divisible by i inside Loop
@@ -61,15 +53,15 @@
             BlockExpression block = Expression.Block(
                 new[] { result, i, boundary },
                     Expression.IfThen(
-                            valueLessThanEqualToOne,
+                            Expression.LessThanOrEqual(value, Expression.Constant(1)),
                             Expression.Return(returnLabel, Expression.Constant(false))
                     ),
                     Expression.IfThen(
-                            valueEqualTwo,
+                            Expression.Equal(value, Expression.Constant(2)),
                             Expression.Return(returnLabel, Expression.Constant(true))
                     ),
                     Expression.IfThen(
-                            valueModTwoZero,
+                            Expression.Equal(Expression.Modulo(value, Expression.Constant(2)), Expression.Constant(0)),
                             Expression.Return(returnLabel, Expression.Constant(false))
                     ),
 
